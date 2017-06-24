@@ -60,6 +60,7 @@
 \usepackage{subcaption}
 \usepackage{chngcntr}			% Numeração das imagens 
 \usepackage{microtype} 			% para melhorias de justificação
+\usepackage{float}
 % ---
 		
 % ---
@@ -283,7 +284,7 @@ There are other types of classifications of a graph and other concepts associate
 
 \subsection{Network Analysis}
 
-There are different kind of analysis that can be done depending on the nature of the graph data. Due to the work presented here, we will explore the aspects of social network analysis, which focus on the structure of relationships (edges) between entities (vertices) in the graph. Several types of analysis can be performed in a graph, but the measure of a node?s centrality is historically one of the most studied cases of analysis \cite{Freeman1978}. A common application for a centrality measure is to find out what are the focal points in a social network, i.e. who are the people that are the most connected to other people? There are three types of centrality measures \cite{Freeman1978}:
+There are different kind of analysis that can be done depending on the nature of the graph data. Due to the work presented here, we will explore the aspects of social network analysis, which focus on the structure of relationships (edges) between entities (vertices) in the graph. Several types of analysis can be performed in a graph, but the measure of a node`s centrality is historically one of the most studied cases of analysis \cite{Freeman1978}. A common application for a centrality measure is to find out what are the focal points in a social network, i.e. who are the people that are the most connected to other people? There are three types of centrality measures \cite{Freeman1978}:
 
 \begin{description}
 \item[Degree Centrality] This measure is given by the number of adjacent vertices. Considering a social network, a person (vertex) that has the greatest number of connections can be considered one of the focal points of the network, since it can directly read the most nodes in the graph. Given a graph with n vertices, the maximum value the degree centrality of a vertex in the graph can be is $n-1$. The degree centrality of a vertex is related to its potential communication activity.
@@ -311,15 +312,58 @@ Scientific research related to graph data models were continuously published bet
  
 Recently this area has gained again attention from the community, due to the emergence of trendy projects (chemistry, biology, social network, semantic web, among others) where the importance of information relies not only in the entities but also in the relationship between them \cite{Angles2012}. Most recent implementations of graph databases are concerned with handling increasing amount of data and improving performance in retrieving and manipulating data.
  
-The most popular graph database according to DBEngines\footnote{https://db-engines.com/en/system/Neo4j} website is Neo4J. It is an open source native graph storage database implemented in Java. Neo4J has its own query language called Cypher, which can be used to create, update and retrieve nodes and relationships. This graph database also provides high availability and scalability for big volume of graph data.
+The most popular graph database according to DBEngines\footnote{https://db-engines.com/en/system/Neo4j} website is Neo4J\footnote{https://neo4j.com/}. It is an open source native graph storage database implemented in Java. Neo4J has its own query language called Cypher, which can be used to create, update and retrieve nodes and relationships. This graph database also provides high availability and scalability for big volume of graph data.
 
+Besides Neo4J, there are other popular graph databases according to DB Engine site. OrientDB\footnote{http://orientdb.com/orientdb/} is a NoSQL Multi-Model database, which means it stores data in the form of documents, key-value stores, objects, graph and others. Like Neo4J, OrientDB is also implemented in Java, but it uses an extended version of SQL that includes special operators to manipulate graph. This database allows the creation of a pre-defined data schema and the definition of complex data type, like dates, decimals and binary objects (BLOB).
+ 
+TitanDB\footnote{http://titan.thinkaurelius.com/} is a native graph database implemented in Java. In order to establish connection with the hard disk, Titan needs to be linked to a data storage system - Cassandra\footnote{http://cassandra.apache.org/}, HBase\footnote{https://hbase.apache.org/} or BerkeleyDB\footnote{http://www.oracle.com/technetwork/database/database-technologies/berkeleydb/overview/index.html} - that is suitable for the application. The creation of nodes, edges and the submission of queries can be done through a Java API or through a Gremlin server.
 
+\subsection{Comparing Graph Databases Performance}
+One of the basic tasks when manipulating a database is to retrieve an object given its id. The experiment described in \cite{jouili2013empirical} records the average time to retrieve a node by its id, given an 500000 nodes graph and 4 clients executing this action 200 times. This process was executed using Neo4J, OrientDB and TitanDB using Cassandra as backend.
+
+\begin{figure}ht]
+\centering
+\includegraphics[width=1\textwidth]{../time_test.png}
+\caption{Chart with mean time that each DB took to retrieve a node by its id}
+\label{fig:figure10}
+\end{figure}
+
+According to Figure \ref{fig:figure10}, Neo4J and OrientDB have similar performance, being OrientDB slightly faster to retrieve a node given its id. On the other hand, TitanDB using Cassandra as backend has a bad performance compared with the other DBs. However, TitanDB can be connected with other backend services, which can improve its performance for this task.
+ 
+Another common concern among developers is the amount of memory taken by the database. In the experiment shown in \cite{mccoll2014performance}, a graph containing 32,000 nodes and 256,000 edges was stored in Neo4J, OrientDB and TitanDB and the amount of memory required by each database was measured.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=1\textwidth]{../memory_test.png}
+\caption{Chart with the amount of memory required for each DB}
+\label{fig:figure11}
+\end{figure}
+
+From the Figure \ref{fig:figure11}, we can notice that OrientDB is the one that consumes the most, reaching up to 10.156 MB of memory. On the other hand, TitanDB requires less memory, only needing 388 MB to store the graph.
+
+\section{Final Considerations}
+In this chapter, we discussed the main concepts related to the work presented in this dissertation. Initially, the definition of Data Warehouse and Multidimensional Model were introduced, followed by a detailed view on different types and operators an OLAP system can have. Then, we covered the main components of a graph and how it can be classified according to different characteristics. Finally, we explained the definition of a Graph Database and went through a historical overview of such systems, as well as a comparison of the most popular Graph DBs nowadays. In the next chapter, we will review the most important research published that implements a OLAP system using Graph Databases.
 
 % ---
 % Literature Revision
 % ---
 \chapter{Graph Cubes: State of the Art}
 % ---
+
+This chapter presents the most important research works published in the area of OLAP systems implemented using graph databases. The first work presented here dates back to 2011 and introduces several concepts - such as graph cube, aggregated graphs and cuboid queries - that serve as basis for other papers published since then.
+
+\section{Graph Cube: On Warehousing and OLAP Multidimensional Networks}
+
+One of the main works in graph analysis using OLAP methods is described in \cite{Zhao2011}, and it  introduces several concepts that will be used by other authors to describe their work in this area. Graph Cube is one of those concepts and it is defined as a multidimensional model that extends multidimensional networks to provide decision support features. A multidimensional network is a graph $N=(V,E,A)$, where $V$ is a set of vertices, $E$ is a set of edges and $A$ is a set of vertex-specific attributes. Each vertex in the graph is a multidimensional tuple and the attributes of the vertex define the graph cube dimensions.
+ 
+A graph cube is formed by all possible aggregate networks calculated from the original multidimensional network. An aggregate network (often called cuboid) is a summarisation of the original graph with respect to one or more dimensions, which is calculated by applying an aggregate function (e.g. COUNT, SUM, AVERAGE, among others) on the vertices attributes. Consider the multidimensional network illustrated in Figure \ref{fig:figure11}.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=.4\textwidth]{../directed_graph_example.png}
+\caption{Example of a directed graph \cite{Tobergte2013}}
+\label{fig:figure12}
+\end{figure}
 
 % ----------------------------------------------------------
 % ELEMENTOS PÓS-TEXTUAIS
