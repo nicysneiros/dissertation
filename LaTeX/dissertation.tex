@@ -63,6 +63,8 @@
 \usepackage{float}
 \usepackage[table,xcdraw]{xcolor}
 \usepackage{tabularx,ragged2e}
+\usepackage{algorithm}% http://ctan.org/pkg/algorithms
+\usepackage{algpseudocode}% http://ctan.org/pkg/algorithmicx
 \newcolumntype{Y}{>{\raggedright\arraybackslash}X} % right "X" column
 \newcolumntype{Z}{>{\raggedleft\arraybackslash}X} % left "X" column
 % ---
@@ -308,6 +310,15 @@ The most popular form of graph model is the labeled property graph model \cite{R
 \item Nodes can be labeled with one or more labels
 \item Relationships are named and directed, i.e. always have start and end nodes
 \end{itemize}
+
+The formal definition for a labeled property graph is given by $G = (V, E, L_V, L_E, A_V, A_E)$, where:
+\begin{itemize}
+\item $V$ is a set of vertices (nodes)
+\item $E \subseteq V \times V$ is a set of edges 
+\item $L_V$ is a set of node labels and $L_E$ is a set of edge labels
+\item $A_V = \{a_1, \dots, a_n\}$ is a set of node attributes, where $a_i = (k_i, m_i)$ is a key-value pair. Each vertex $v_i \in V$ is associated with an attribute vector. $A_E = \{b_1, \dots, b_n\}$ is the set of edge attributes defined in the same way as node attributes.
+\end{itemize}
+
 An example of a labeled property graph was shown in Figure \ref{fig:figure5}, where the nodes have the label ``User'' and the property ``name'' and the relationships are named ``Follows'' and have arrows indicating the direction of the edge.
 
 \subsection{Historical Overview}
@@ -577,6 +588,142 @@ The work proposed here will be focused in heterogeneous graph datasets and will 
 \section{Final Considerations}
 
 In this chapter, we presented the main research works published related to OLAP system using Graph Databases. The majority of the works available only supported homogeneous graph, but they introduced important concepts of the area, such as graph cubes and aggregate graph. The implementations that actually gave support to heterogeneous graph, proposed different graph models in order to answer analytical queries. In the next chapter, we will specify a simple OLAP system using Graph Database without the need to define a new graph model.
+
+\chapter{OLAP Analysis on Graph Database}
+In this chapter we will propose a system capable of performing OLAP analysis and that supports heterogeneous graphs, without the need to define a new graph data model. Initially, we will contextualise the proposed system and introduce a running example that will be used to better explain the system operation. Then, the system?s architecture is presented and its main components are further detailed in the following sections.
+
+\section{Contextualisation}
+In Chapter 3, we investigated some of the main works in the area of Graph OLAP. Most of them only give support to homogeneous graph \cite{Zhao2011}\cite{Chen2008}\cite{Wang2014}, while real world graph-like data contains different types of nodes and edges.The frameworks HMGraph \cite{Yin2012} and GRAD Graph Cube \cite{ghrab2015framework} support heterogeneous graph, but they propose a new multidimensional model in order to perform OLAP analysis.
+
+The objective of the system proposed here is to support OLAP analysis on graph databases without the need to re-model operational data. This will be done by adding a layer of pre-processed aggregate graph and an analytical query processor module on top of the operational graph database.
+
+\section{Running Example}
+Consider the DBLP dataset as the running example that will be used throughout this chapter to help explaining the main concepts of the system proposed. The DBLP\footnote{http://dblp.uni-trier.de/faq/What+is+dblp.html} is an online computer science bibliography that, up until May 2016, indexes more than 3.3 million publications by more than 1.7 million authors. For this example, we will consider that the data was extracted and modelled according to the schema shown in Figure \ref{fig:figure25} and described as follows:
+\begin{itemize}
+\item Each publication becomes a node with label \emph{Publication} and with the attributes \emph{title}, \emph{year} and \emph{journal}.
+\item Each author becomes a node with label \emph{Author} and with the attribute \emph{name}
+\item Edges labeled \emph{PUBLISHED} connect Author nodes to Publication nodes, representing the relationship between an author and their published work.
+\item Edges labeled \emph{COAUTHOR} connect Author nodes to other Author nodes, representing the relationship between authors that have contributed to the same published work.
+\end{itemize}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.7\textwidth]{../dblp_graph.png}
+\caption{Schema representation of the DBLP graph data}
+\label{fig:figure25}
+\end{figure}
+
+Figure \ref{fig:figure26} shows a subset of the original DBLP dataset, modelled according to the schema representation depicted in Figure \ref{fig:figure25}. The following graph will be used as our running example throughout this chapter.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=1\textwidth]{../running_example.png}
+\caption{Running Example with subset of DBLP dataset}
+\label{fig:figure26}
+\end{figure}
+
+\section{Dimensions and Measures}
+
+As discussed in Chapter 2, an OLAP system is a tool that facilitates multidimensional analysis of the data. In order to perform such kind of analysis, it is necessary to define the dimensions and measures that will be considered during the multidimensional analysis:
+\begin{description}
+\item[Dimension] Given a labeled property graph $G = (V, E, L_V, L_E, A_V, A_E)$, as presented in Chapter 2, a dimension is given by $d = (a, l)$, where $a \in A_V$ and $l \in L_V$. In our running example, we can define $d_1 = (journal, Publication)$ and $d_2 = (year, Publication)$, i.e. the \emph{Publication} attributes \emph{journal} and \emph{year} are dimensions $d_1$ and $d_2$ in our OLAP system, respectively.
+\item[Measure] Given a labeled property graph $G = (V, E, L_V, L_E, A_V, A_E)$, a measure is a calculation computed over the graph $G$ using a function $F$, that can return the type of measures defined by  \cite{ghrab2015framework}:
+\begin{description}
+\item[Content-based measure] For this kind of measure is calculated based on the nodes and edges attributes. In our running example, the total number of authors that published a work in 2007 is a content-based measure that is calculated using the function COUNT, which will count the number of \emph{Author} nodes that have a relationship \emph{PUBLISHED} to \emph{Publication} nodes that have attribute \emph{year} equals to 2007.
+\item[Graph-specific measure] This type of measure is calculated by applying a network analysis algorithm over the graph. In our running example, the list of authors that most contributed with other authors is a graph-specific measure that is computed by applying the degree centrality measure to the \emph{Author} nodes of the graph.
+\item[Graph as measure] This kind of measure is given by different aggregation levels of a graph. In our running example, the network of authors and  publications aggregated according to the journal the work was published in is a graph that represents a measure.
+\end{description}
+\end{description}
+
+\section{Architecture}
+
+The Graph OLAP system proposed in this work attempts to provide an efficient way to answer analytical queries without having to propose a new graph data model, which would imply changing the original data source model. The Figure \ref{fig:figure27} depicts the architecture of the system, illustrating its main components: Graph Aggregators, Aggregated Graphs and Analytical Query Processor.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.8\textwidth]{../Architecture.png}
+\caption{OLAP Analysis over Graph Databases Architecture}
+\label{fig:figure27}
+\end{figure}
+
+The system?s input is an analytical query submitted by the user, that will be processed by the Analytical Query Processor (AQP). According to the type of measure expected by the user, the AQP will determine which specific processor will handle the query: graph-based, content-based or graph measures processors. If the user asks for a graph-based measure, the AQP will consume the original data stored in the graph database to calculate the measure. On the other hand, if the user requires a content-based or a graph as measure, the AQP will calculate the measure based on the data from Aggregate Graphs, which are also stored in graph databases.
+
+The Aggregate Graphs are generated by the Graph Aggregators (GAs), which are defined during the design process of the system by the project designer. The project designer is responsible to define what are the dimensions considered in the OLAP system and, therefore, create the GAs that will generate all possible aggregate graphs for the dimensions. More details on Aggregate Graphs and Graph Aggregators are given in the following sections.
+
+The data source considered for this system is a Graph Database that follows the labeled property graph model and supports heterogeneous graphs. This means that nodes can have one or more labels indicating different types of entities. Nodes and relationships can have properties. We assume that the data stored in the GDB is integrated, i.e. the data in the repository is consistent, well-formatted and normalised.
+
+\section{Aggregate Graph}
+Given a graph $G = (V, E, L_V, L_E, A_V, A_E)$ and a set of dimensions $D = \{d_1, \dots, d_n\}$, where $d_i \in A_V \cup A_E$, an aggregate graph is generated by applying an aggregate function $F$ to one or more dimensions. The result is a new graph $G_A = (V_A, E_A, L_{VA}, L_{EA}, A_{VA}, A_{EA})$, where:
+\begin{itemize}
+\item $VA = \{v^A_1, \dots, v^A_n\}$ is a set of aggregate vertices, where each vertex $v^A_i$ either (i) corresponds to the result of applying the function $F$ to a set of vertices $V' \subseteq V$ that is associated with an attribute vector $[a_1, \dots, a_k]$ containing one or more dimensions in $D$ or (ii) corresponds to a vertex in $V$.
+\item $E_A \subseteq V_A \times V_A$ is a set of aggregate edges, where each edge $e^A_i$ either (i) corresponds to the result of collapsing a set of edges $E' \subseteq E$ that connects one or more vertices in $V$ that were aggregated in $V_A$ or (ii) corresponds to an edge in $E$.
+\item $L_{VA}$ is a set of aggregate vertex labels and $L_{EA}$ is a set of aggregate edge labels
+\item $A_{VA} = \{a_1, \dots, a_n\}$ is the set of attributes for the aggregate vertices, where $a_i = (k_i, m_i)$ is a key-value pair. Each aggregate vertex $v_i \in V_A$ is associated with an attribute vector. $A_{EA} = \{b_1, \dots, b_n\}$ is the set of aggregate edge attributes defined in the same way as aggregate vertices attributes.
+\end{itemize}
+
+Consider the graph depicted in Figure \ref{fig:figure26} of our running example. Figure \ref{fig:figure28} shows the aggregate graph $G_A$ obtained by applying the aggregate function COUNT to the dimension set $D = \{d\}$, where $d = (year, Publication)$. Notice that the resulting aggregate graph ends up with the same \emph{Author} nodes as the original graph, since these vertices do not have attributes contained in the dimension set $D$. The \emph{Publication} nodes were aggregated according to their \emph{year} attribute, resulting in three nodes representing the works published in 2017, 2016 and 2015. The aggregate vertices also store the measure calculated using the function COUNT. The edges with the label PUBLISHED were collapsed, representing the connection between each author and the group of works published in a specific year. The collapsed edges also store the measure obtained by the use of COUNT function.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.6\textwidth]{../aggregate_graph_running_example.png}
+\caption{Aggregate Graph obtained from running example graph}
+\label{fig:figure28}
+\end{figure}
+
+\section{Graph Aggregators}
+
+The Graph Aggregators (GAs) are modules responsible for generating the aggregate graph that will be used to answer the analytical query submitted by the user. During the design process for the system, the Project Designer is responsible for building the GAs based on the dimensions and measures the system should be able to analyse. Each GA will receive as input the original graph G stored in the Graph Database, the set of dimensions to be aggregated D, the aggregate function F and should provide as output an aggregate graph as defined in the previous section. Algorithm \ref{alg:algorithm1} describes the process performed by a GA in order to generate an aggregate graph.
+
+\begin{algorithm}
+ \caption{Graph Aggregator Process}\label{alg:algorithm1}
+  \begin{algorithmic}[1]
+    \Function{$generateAggGraph$}{$G, F, D$}
+      \State{$aggVertices \gets []$}
+      \State{$aggEdges \gets []$}
+      \For{$ node \textrm{ in } G.vertices$}
+        \If {$ node.label  \textrm{ in } D $}
+          \State{$dimValue \gets getDimValue(node, D)$}
+           \If {$ dimValue  \textrm{ in } aggVertices $}
+             \State{$aggregateVertices(dimValue, node, F)$}
+             \State{$aggregateEdges(dimValue, node, F)$}
+           \Else
+              \State{$aggVertices.add(dimValue, node)$}
+              \State{$aggregateEdges(dimValue, node, F)$}
+           \EndIf
+       \Else
+          \State{$aggVertices.add(node)$}
+        \EndIf
+      \EndFor
+      \State{$aggGraph \gets (aggVertices, aggEdges)$}
+      \State \Return{$aggGraph$}
+    \EndFunction
+  \end{algorithmic}
+\end{algorithm}
+
+The GA algorithm starts by creating an empty set of aggregate vertices and edges that will compose the final aggregate graph that will be returned. Then, the GA will iterate over all the vertices (nodes) of the original graph G, checking for each node if it has the same label as the dimension being aggregated. If the node has the same label, the algorithm checks if already exists an aggregate node for the dimension value of the node. If the aggregate node exists, we collapse the value of the node to the value of the aggregate node using the function F and updating the aggregate node value. We also aggregate the edges that are connected to the node accordingly. If the aggregate node does not exist, we add a new aggregate node with the initial value equals to node?s dimension value and aggregate its edges accordingly. If the node does not have the same label as the dimension being aggregated, we only add the node as it is to the aggregate vertices set. Finally, we setup the aggregate graph and return it.
+
+Once the aggregate graph is generated, it will be stored in a graph database and it will be accessed by the Analytical Query Processor.
+
+\section{Analytical Query Processor}
+
+The Analytical Query Processor (AQP) is responsible for processing the query submitted by the user. This component contains three modules that will process the query differently based on the type of measure requested by the user:
+\begin{description}
+\item[Graph-based measure] To calculate this measure, the AQP consumes the data from the original graph database and uses any existing library to perform network analysis on the data. 
+
+In our running example, we could submit a query asking for the \emph{Author} node with highest centrality degree. The AQP calculates the centrality degree for each node in the original graph using an external library. Then, it should return the node with id \textbf{A2}, since it is the Author node with the highest number of connections with other nodes.
+
+\item[Content-based measure] To calculate this measure, the AQP consumes the data from an aggregate graph and uses the aggregate function to give the resulting measure, which can be a single value, a list or a table of values. This module's response is similar to the response given by traditional OLAP systems.
+
+From our running example, we can ask for the count of publications by year. In this case AQP consumes the data from the aggregate graph illustrated in Figure \ref{fig:figure28} and it would list the nodes with \emph{Publication Aggregate} label, which already contains the count measure as attribute.
+
+\item[Graph as measure] For this type of measure, the AQP also consumes data from an aggregate graph, but in this case, the measure is the aggregated graph itself. Therefore, this module does not need to perform other calculations.
+
+For instance, the aggregate graph shown in Figure \ref{fig:figure28} can be considered a measure if the user requests a topological view of the original data grouping the publications by year
+\end{description}
+
+\section{Final Considerations}
+
+
 
 % ----------------------------------------------------------
 % ELEMENTOS PÓS-TEXTUAIS
