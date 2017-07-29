@@ -28,112 +28,83 @@
 % ------------------------------------------------------------------------
 % ------------------------------------------------------------------------
 
-\documentclass[
-	% -- opções da classe memoir --
-	12pt,				% tamanho da fonte
-	openright,			% capítulos começam em pág ímpar (insere página vazia caso preciso)
-	twoside,			% para impressão em verso e anverso. Oposto a oneside
-	a4paper,			% tamanho do papel. 
-	% -- opções da classe abntex2 --
-	%chapter=TITLE,		% títulos de capítulos convertidos em letras maiúsculas
-	%section=TITLE,		% títulos de seções convertidos em letras maiúsculas
-	%subsection=TITLE,	% títulos de subseções convertidos em letras maiúsculas
-	%subsubsection=TITLE,% títulos de subsubseções convertidos em letras maiúsculas
-	% -- opções do pacote babel --
-	french,				% idioma adicional para hifenização
-	spanish,			% idioma adicional para hifenização
-	brazil,				% o último idioma é o principal do documento
-        english
-	]{abntex2}
+\documentclass[en]{ufpethesis}
 
-% ---
-% Pacotes básicos 
-% ---
-\usepackage{lmodern}			% Usa a fonte Latin Modern			
-\usepackage[T1]{fontenc}			% Selecao de codigos de fonte.
-\usepackage[utf8]{inputenc}		% Codificacao do documento (conversão automática dos acentos)
-\usepackage{lastpage}			% Usado pela Ficha catalográfica
-\usepackage{indentfirst}			% Indenta o primeiro parágrafo de cada seção.
-\usepackage{color}				% Controle das cores
 \usepackage{graphicx}			% Inclusão de gráficos
 \usepackage{caption}
 \usepackage{subcaption}
-\usepackage{chngcntr}			% Numeração das imagens 
-\usepackage{microtype} 			% para melhorias de justificação
-\usepackage{float}
 \usepackage[table,xcdraw]{xcolor}
 \usepackage{tabularx,ragged2e}
 \usepackage{algorithm}% http://ctan.org/pkg/algorithms
 \usepackage{algpseudocode}% http://ctan.org/pkg/algorithmicx
 \newcolumntype{Y}{>{\raggedright\arraybackslash}X} % right "X" column
 \newcolumntype{Z}{>{\raggedleft\arraybackslash}X} % left "X" column
-% ---
-		
-% ---
-% Pacotes adicionais, usados apenas no âmbito do Modelo Canônico do abnteX2
-% ---
-\usepackage{lipsum}				% para geração de dummy text
-% ---
+\usepackage{sectsty}
+\usepackage{ textcomp }
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\sectionfont{\bfseries\Large\raggedright}
 
-% ---
-% Pacotes de citações
-% ---
-\usepackage[english,hyperpageref]{backref}	 % Paginas com as citações na bibl
-\usepackage[alf]{abntex2cite}	% Citações padrão ABNT
 
-% --- 
-% CONFIGURAÇÕES DE PACOTES
-% --- 
+%% Identificação:
 
-% ---
-% Configurações do pacote backref
-% Usado sem a opção hyperpageref de backref
-\renewcommand{\backrefpagesname}{Cited in page(s):~}
-% Texto padrão antes do número das páginas
-\renewcommand{\backref}{}
-% Define os textos da citação
-\renewcommand*{\backrefalt}[4]{
-	\ifcase #1 %
-		No citation in text%
-	\or
-		Cited in page #2.%
-	\else
-		Cited #1 times in pages #2.%
-	\fi}%
-% ---
+% Universidade
+% e.g. \university{Universidade de Campinas}
+% Na UFPE, comente a linha a seguir
+\university{Universidade Federal de Pernambuco}
 
-% ---
-% Configurações de aparência do PDF final
+% Endereço (cidade)
+% e.g. \address{Campinas}
+% Na UFPE, comente a linha a seguir
+\address{Recife}
 
-% alterando o aspecto da cor azul
-\definecolor{blue}{RGB}{41,5,195}
+% Instituto ou Centro Acadêmico
+% e.g. \institute{Centro de Ciências Exatas e da Natureza}
+% Comente se não se aplicar
+\institute{Centro de Inform\'{a}tica}
 
-% --- 
-% Espaçamentos entre linhas e parágrafos 
-% --- 
+% Departamento acadêmico
+% e.g. \department{Departamento de Informática}
+% Comente se não se aplicar
+\department{Departamento de Inform\'{a}tica}
 
-% O tamanho do parágrafo é dado por:
-\setlength{\parindent}{1.3cm}
+% Programa de pós-graduação
+% e.g. \program{Pós-graduação em Ciência da Computação}
+\program{P\'{o}s-gradua\c{c}\~{a}o em Ci\^{e}ncia da Computa\c{c}\~{a}o}
 
-% Controle do espaçamento entre um parágrafo e outro:
-\setlength{\parskip}{0.2cm}  % tente também \onelineskip
+% Área de titulação
+% e.g. \majorfield{Ciência da Computação}
+\majorfield{Ci\^{e}ncia da Computa\c{c}\~{a}o}
 
-%Controle da numeração das figuras por capitulo
-\counterwithin{figure}{chapter}
+% Título da dissertação/tese
+% e.g. \title{Sobre a conjectura $P=NP$}
+\title{Using OLAP Queries for Data Analysis on Graph Databases}
 
+% Data da defesa
+% e.g. \date{19 de fevereiro de 2003}
+\date{21 de agosto de 2017}
+
+% Autor
+% e.g. \author{José da Silva}
+\author{Nicolle Chaves Cysneiros}
+
+% Orientador(a)
+% Opção: [f] - para orientador do sexo feminino
+% e.g. \adviser[f]{Profa. Dra. Maria Santos}
+\adviser[f]{Prof\textordfeminine. Dr\textordfeminine. Ana Carolina Salgado}
 
 % ----
 % Início do documento
 % ----
 \begin{document}
 
-% Retira espaço extra obsoleto entre as frases.
-\frenchspacing 
-
+\frontmatter
+\frontpage
+\presentationpage
 % ----------------------------------------------------------
 % ELEMENTOS TEXTUAIS
 % ----------------------------------------------------------
-\textual
+\mainmatter
 
 % ----------------------------------------------------------
 % Introduction
@@ -728,12 +699,14 @@ For instance, the aggregate graph shown in Figure \ref{fig:figure28} can be cons
 % ----------------------------------------------------------
 % ELEMENTOS PÓS-TEXTUAIS
 % ----------------------------------------------------------
-\postextual
+\backmatter
 % ----------------------------------------------------------
 
 % ----------------------------------------------------------
 % Referências bibliográficas
 % ----------------------------------------------------------
+\nocite{*}
+\bibliographystyle{alpha}
 \bibliography{references}
 
 % ----------------------------------------------------------
