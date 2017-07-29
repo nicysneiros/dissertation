@@ -561,7 +561,7 @@ The work proposed here will be focused in heterogeneous graph datasets and will 
 In this chapter, we presented the main research works published related to OLAP system using Graph Databases. The majority of the works available only supported homogeneous graph, but they introduced important concepts of the area, such as graph cubes and aggregate graph. The implementations that actually gave support to heterogeneous graph, proposed different graph models in order to answer analytical queries. In the next chapter, we will specify a simple OLAP system using Graph Database without the need to define a new graph model.
 
 \chapter{OLAP Analysis on Graph Database}
-In this chapter we will propose a system capable of performing OLAP analysis and that supports heterogeneous graphs, without the need to define a new graph data model. Initially, we will contextualise the proposed system and introduce a running example that will be used to better explain the system operation. Then, the system?s architecture is presented and its main components are further detailed in the following sections.
+In this chapter we will propose a system capable of performing OLAP analysis and that supports heterogeneous graphs, without the need to define a new graph data model. Initially, we will contextualise the proposed system and introduce a running example that will be used to better explain the system operation. Then, the system's architecture is presented and its main components are further detailed in the following sections.
 
 \section{Contextualisation}
 In Chapter 3, we investigated some of the main works in the area of Graph OLAP. Most of them only give support to homogeneous graph \cite{Zhao2011}\cite{Chen2008}\cite{Wang2014}, while real world graph-like data contains different types of nodes and edges.The frameworks HMGraph \cite{Yin2012} and GRAD Graph Cube \cite{ghrab2015framework} support heterogeneous graph, but they propose a new multidimensional model in order to perform OLAP analysis.
@@ -598,17 +598,19 @@ Figure \ref{fig:figure26} shows a subset of the original DBLP dataset, modelled 
 As discussed in Chapter 2, an OLAP system is a tool that facilitates multidimensional analysis of the data. In order to perform such kind of analysis, it is necessary to define the dimensions and measures that will be considered during the multidimensional analysis:
 \begin{description}
 \item[Dimension] Given a labeled property graph $G = (V, E, L_V, L_E, A_V, A_E)$, as presented in Chapter 2, a dimension is given by $d = (a, l)$, where $a \in A_V$ and $l \in L_V$. In our running example, we can define $d_1 = (journal, Publication)$ and $d_2 = (year, Publication)$, i.e. the \emph{Publication} attributes \emph{journal} and \emph{year} are dimensions $d_1$ and $d_2$ in our OLAP system, respectively.
-\item[Measure] Given a labeled property graph $G = (V, E, L_V, L_E, A_V, A_E)$, a measure is a calculation computed over the graph $G$ using a function $F$, that can return the type of measures defined by  \cite{ghrab2015framework}:
+\item[Measure] Given a labeled property graph $G = (V, E, L_V, L_E, A_V, A_E)$, a measure $m$ is a calculation computed over the graph $G$ using a function $F$ ($m=F(G)$), that can return the type of measures defined by  \cite{ghrab2015framework}:
 \begin{description}
-\item[Content-based measure] For this kind of measure is calculated based on the nodes and edges attributes. In our running example, the total number of authors that published a work in 2007 is a content-based measure that is calculated using the function COUNT, which will count the number of \emph{Author} nodes that have a relationship \emph{PUBLISHED} to \emph{Publication} nodes that have attribute \emph{year} equals to 2007.
-\item[Graph-specific measure] This type of measure is calculated by applying a network analysis algorithm over the graph. In our running example, the list of authors that most contributed with other authors is a graph-specific measure that is computed by applying the degree centrality measure to the \emph{Author} nodes of the graph.
-\item[Graph as measure] This kind of measure is given by different aggregation levels of a graph. In our running example, the network of authors and  publications aggregated according to the journal the work was published in is a graph that represents a measure.
+\item[Content-based measure] For this kind of measure is calculated based on the nodes and edges attributes and the function $F \in \{SUM, COUNT, AVG, \dots\}$ used in the calculation are similar to the ones used in an OLAP system. In our running example, the total number of authors that published a work in 2007 is a content-based measure that is calculated using the function $COUNT$, which will count the number of \emph{Author} nodes that have a relationship \emph{PUBLISHED} to \emph{Publication} nodes that have attribute \emph{year} equals to 2007.
+\item[Graph-specific measure] This type of measure is calculated by applying a network analysis algorithm over the graph, i.e. a network analysis algorithm is used as the function $F$. In our running example, the list of authors that most contributed with other authors is a graph-specific measure that is computed by applying the degree centrality measure to the \emph{Author} nodes of the graph.
+\item[Graph as measure] This kind of measure is given by different aggregation levels of a graph and the function $F$ that calculates this measure is the aggregate function that will generate the aggregate graph. In our running example, the network of authors and  publications aggregated according to the journal the work was published in is a graph that represents a measure.
 \end{description}
 \end{description}
 
 \section{Architecture}
 
 The Graph OLAP system proposed in this work attempts to provide an efficient way to answer analytical queries without having to propose a new graph data model, which would imply changing the original data source model. The Figure \ref{fig:figure27} depicts the architecture of the system, illustrating its main components: Graph Aggregators, Aggregated Graphs and Analytical Query Processor.
+
+The Graph Aggregators are modules that are responsible for processing the original data and generate Aggregate Graphs, which are stored in Graph Databases. The Analytical Query Processor is in charge of processing the incoming query and determine whether it should be answered by processing the original or the aggregate date, based on the type of measure being analysed.
 
 \begin{figure}[ht]
 \centering
@@ -617,7 +619,7 @@ The Graph OLAP system proposed in this work attempts to provide an efficient way
 \label{fig:figure27}
 \end{figure}
 
-The system?s input is an analytical query submitted by the user, that will be processed by the Analytical Query Processor (AQP). According to the type of measure expected by the user, the AQP will determine which specific processor will handle the query: graph-based, content-based or graph measures processors. If the user asks for a graph-based measure, the AQP will consume the original data stored in the graph database to calculate the measure. On the other hand, if the user requires a content-based or a graph as measure, the AQP will calculate the measure based on the data from Aggregate Graphs, which are also stored in graph databases.
+The system's input is an analytical query submitted by the user, that will be processed by the Analytical Query Processor (AQP). According to the type of measure expected by the user, the AQP will determine which specific processor will handle the query: graph-based, content-based or graph measures processors. If the user asks for a graph-based measure, the AQP will consume the original data stored in the graph database to calculate the measure. On the other hand, if the user requires a content-based or a graph as measure, the AQP will calculate the measure based on the data from Aggregate Graphs, which are also stored in graph databases.
 
 The Aggregate Graphs are generated by the Graph Aggregators (GAs), which are defined during the design process of the system by the project designer. The project designer is responsible to define what are the dimensions considered in the OLAP system and, therefore, create the GAs that will generate all possible aggregate graphs for the dimensions. More details on Aggregate Graphs and Graph Aggregators are given in the following sections.
 
@@ -649,29 +651,29 @@ The Graph Aggregators (GAs) are modules responsible for generating the aggregate
  \caption{Graph Aggregator Process}\label{alg:algorithm1}
   \begin{algorithmic}[1]
     \Function{$generateAggGraph$}{$G, F, D$}
-      \State{$aggVertices \gets []$}
-      \State{$aggEdges \gets []$}
-      \For{$ node \textrm{ in } G.vertices$}
-        \If {$ node.label  \textrm{ in } D $}
+      \State{$aggVertices \gets []$} \label{alg:line2}
+      \State{$aggEdges \gets []$} \label{alg:line3}
+      \For{$ node \textrm{ in } G.vertices$}  \label{alg:line4}
+        \If {$ node.label  \textrm{ in } D $}  \label{alg:line5}
           \State{$dimValue \gets getDimValue(node, D)$}
-           \If {$ dimValue  \textrm{ in } aggVertices $}
-             \State{$aggregateVertices(dimValue, node, F)$}
-             \State{$aggregateEdges(dimValue, node, F)$}
+           \If {$ dimValue  \textrm{ in } aggVertices $}  \label{alg:line7}
+             \State{$aggregateVertices(dimValue, node, F)$}  \label{alg:line8}
+             \State{$aggregateEdges(dimValue, node, F)$}  \label{alg:line9}
            \Else
-              \State{$aggVertices.add(dimValue, node)$}
-              \State{$aggregateEdges(dimValue, node, F)$}
+              \State{$aggVertices.add(dimValue, node)$}  \label{alg:line11}
+              \State{$aggregateEdges(dimValue, node, F)$}  \label{alg:line12}
            \EndIf
        \Else
-          \State{$aggVertices.add(node)$}
+          \State{$aggVertices.add(node)$}  \label{alg:line15}
         \EndIf
       \EndFor
-      \State{$aggGraph \gets (aggVertices, aggEdges)$}
-      \State \Return{$aggGraph$}
+      \State{$aggGraph \gets (aggVertices, aggEdges)$}  \label{alg:line18}
+      \State \Return{$aggGraph$}  \label{alg:line19}
     \EndFunction
   \end{algorithmic}
 \end{algorithm}
 
-The GA algorithm starts by creating an empty set of aggregate vertices and edges that will compose the final aggregate graph that will be returned. Then, the GA will iterate over all the vertices (nodes) of the original graph G, checking for each node if it has the same label as the dimension being aggregated. If the node has the same label, the algorithm checks if already exists an aggregate node for the dimension value of the node. If the aggregate node exists, we collapse the value of the node to the value of the aggregate node using the function F and updating the aggregate node value. We also aggregate the edges that are connected to the node accordingly. If the aggregate node does not exist, we add a new aggregate node with the initial value equals to node?s dimension value and aggregate its edges accordingly. If the node does not have the same label as the dimension being aggregated, we only add the node as it is to the aggregate vertices set. Finally, we setup the aggregate graph and return it.
+The GA algorithm starts by creating an empty set of aggregate vertices and edges (lines \ref{alg:line2} and \ref{alg:line3}) that will compose the final aggregate graph that will be returned. Then, the GA will iterate over all the vertices (nodes) of the original graph G (line \ref{alg:line4}), checking for each node if it has the same label as the dimension being aggregated (line \ref{alg:line5}). If the node has the same label, the algorithm checks if already exists an aggregate node for the dimension value of the node (line \ref{alg:line7}). If the aggregate node exists, we collapse the value of the node to the value of the aggregate node using the function F and updating the aggregate node value (line \ref{alg:line8}). We also aggregate the edges that are connected to the node accordingly (line \ref{alg:line9}). If the aggregate node does not exist, we add a new aggregate node with the initial value equals to node's dimension value and aggregate its edges accordingly (lines \ref{alg:line11} and \ref{alg:line12}). If the node does not have the same label as the dimension being aggregated, we only add the node as it is to the aggregate vertices set (line \ref{alg:line15}). Finally, we setup the aggregate graph and return it (lines \ref{alg:line18} and \ref{alg:line19}).
 
 Once the aggregate graph is generated, it will be stored in a graph database and it will be accessed by the Analytical Query Processor.
 
@@ -693,8 +695,9 @@ For instance, the aggregate graph shown in Figure \ref{fig:figure28} can be cons
 \end{description}
 
 \section{Final Considerations}
+In this chapter, we showed the main components of the proposed system and what is the general flow to answer an analytical query. We also specified in details how each one of the components works and what are their roles in the data analysis process. In the next chapter, we will report how the proposed system was implemented and show some experiments and the results obtained.
 
-
+\chapter{Experiments and Results}
 
 % ----------------------------------------------------------
 % ELEMENTOS PÓS-TEXTUAIS
