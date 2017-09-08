@@ -178,7 +178,7 @@ grau de \@degree\ em \@majorfield.}
 % English
 \else\if\@language1
   \gdef\@notdefined{UNDEFINED}
-  \gdef\acknowledgementsname{Acknowledgements}
+  \gdef\acknowledgementsname{Agradecimentos}
   \gdef\@axiomname{Axiom}
   \gdef\@conjecturename{Conjecture}
   \gdef\@defname{Definition}
@@ -669,7 +669,7 @@ grau de \@degree\ em \@majorfield.}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \global\renewenvironment{thebibliography}[1]
-     {\chapter*{\bibname}%
+     {\chapter*{References}%
       \list{\@biblabel{\@arabic\c@enumiv}}%
            {\settowidth\labelwidth{\@biblabel{#1}}%
             \leftmargin\labelwidth
@@ -1150,7 +1150,7 @@ grau de \@degree\ em \@majorfield.}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \global\renewenvironment{thebibliography}[1]
-     {\chapter*{\bibname}%
+     {\chapter*{References}%
       \list{\@biblabel{\@arabic\c@enumiv}}%
            {\settowidth\labelwidth{\@biblabel{#1}}%
             \leftmargin\labelwidth
