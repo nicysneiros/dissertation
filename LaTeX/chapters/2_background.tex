@@ -7,7 +7,7 @@ According to \cite{Inmon2005}, a data warehouse (DW) is ``a subject-oriented, in
  
 The second characteristic of a data warehouse is that it is integrated, which means it contains data coming from multiple different sources. During the process of loading the warehouse, the data is converted, formatted, normalised and go through any other process to make the final information stored in the warehouse consistent. Another important aspect of a data warehouse is that it is nonvolatile, which means that the data in the warehouse does not get updated as operational environment. The warehouse is loaded in batches and it stores a snapshot, creating a history of the data. The final important aspect of a DW is that every record of data contains some sort of a time attribute to mark the moment in which the record is accurate.
  
-Figure \ref{fig:figure1} shows the basic elements of a data warehouse \cite{Kimball2011}. The Operational Source Systems capture and store the transactions of the business and they are considered elements outside of the data warehouse, since there is no control on the content or the format of the data that they store. The Data Staging Area is where the process of Extract-Transformation-Load (ETL) is made: the data is extracted from the operations source system, then they are transformed in order to integrate all the information in a consistent format, and finally the data is loaded into the presentation area.
+Figure \ref{fig:figure1} shows the basic elements of a data warehouse \cite{Kimball2011}. The Operational Source Systems capture and store the transactions of the business and they are considered elements outside of the data warehouse, since there is no control on the content or the format of the data that they store. The Data Staging Area is where the process of Extract-Transformation-Load (ETL) is made: the data is extracted from the operational source system, then they are transformed in order to integrate all the information in a consistent format, and finally the data is loaded into the presentation area.
 
 \begin{figure}[ht]
 \centering
@@ -23,7 +23,7 @@ Finally, the Data Access Tools query the data in the presentation area. This ele
 \section{Multidimensional Model}
 The main functionality of a data warehouse is to facilitate multidimensional analysis \cite{OLAPCouncil}. This type of analysis reduces the number of misinterpretations by aligning the data with the analyst's mental model of the business. The multidimensional analysis provides an easy navigation through the database, showing specific subsets of data in different orientations and executing analytical calculations.
  
-In order to do multidimensional analysis, the data must be organised in a multidimensional model, where information is stored in a multidimensional array called \emph{hypercube} or \emph{cube} \cite{Vassiliadis1998}. A cube is composed by cells that store measures aggregated by the data dimensions. A \emph{dimension} is a cube's structural attribute formed by a list of properties that are similar to each other according to the user's perception of the data. Measures are the values being analysed by the user. Figure \ref{fig:figure2} shows an example of the dimensions and measures extracted from a sales application.
+In order to perform multidimensional analysis, the data must be organised in a multidimensional model, where information is stored in a multidimensional array called \emph{hypercube} or \emph{cube} \cite{Vassiliadis1998}. A cube is composed by cells that store measures aggregated by the data dimensions. A \emph{dimension} is a cube's structural attribute formed by a list of properties that are similar to each other according to the user's perception of the data. Measures are the values being analysed by the user. Figure \ref{fig:figure2} shows an example of the dimensions and measures extracted from a sales application.
 
  
 As shown in Figure \ref{fig:figure2} , each dimension (Geography, Time and Item) can be associated with an hierarchy of data aggregation levels. This feature allows user to view the data from different levels of details, for example: the measure \emph{Sales} aggregated by \emph{Region} can be detailed by \emph{Country} or even further detailed by \emph{City}.
@@ -119,6 +119,8 @@ Graph Theory is a branch of Mathematics dedicated to the study of graph structur
 \label{fig:figure8}
 \end{figure}
 
+\item[Homogeneous Graph] It is a graph that has only one type of vertex.
+\item[Heterogeneous Graph] It is a graph that has different types of vertices.
 \item[Subgraph] It is a graph obtained from another graph $G$, where its vertices are a subset of the vertices of $G$ and its edges are a subset of the edges of $G$. Figure \ref{fig:figure9} shows in \ref{fig:figure9subfig2} a subgraph of the graph in \ref{fig:figure9subfig1}.
 \item[Path] It is a subgraph obtained by a sequence of adjacent and distinct vertices.
 
@@ -147,11 +149,35 @@ There are other types of classifications of a graph and other concepts associate
 There are different kind of analysis that can be done depending on the nature of the graph data. Due to the work presented here, we will explore the aspects of social network analysis, which focus on the structure of relationships (edges) between entities (vertices) in the graph. Several types of analysis can be performed in a graph, but the measure of a vertex's centrality is historically one of the most studied cases of analysis \cite{Freeman1978}. A common application for a centrality measure is to find out what are the focal points in a social network, i.e. who are the people that are the most connected to other people? There are three types of centrality measures \cite{Freeman1978}:
 
 \begin{description}
-\item[Degree Centrality] This measure is given by the number of adjacent vertices. Considering a social network, a person (vertex) that has the greatest number of connections can be considered one of the focal points of the network, since it can directly read the most vertices in the graph. Given a graph with n vertices, the maximum value the degree centrality of a vertex in the graph can be is $n-1$. The degree centrality of a vertex is related to its potential communication activity.
+\item[Degree Centrality] This measure is given by the number of adjacent vertices. Formally, the Degree Centrality $C_D$ of a vertex $v_k$ can be given by
 
-\item[Betweenness Centrality] This measure is given by the frequency in which a vertex is present in the shortest path between other vertices. Considering a social network, a person with high betweenness centrality is capable of influencing others by intercepting connections between several vertices in the graph. The betweenness centrality of a vertex is related to its potential control of communication.
+\begin{equation}
+C_D(v_k) = \sum_{i=1}^{n} a(v_i, v_k),
+\end{equation}
 
-\item[Closeness Centrality] This measure is given by the inverse of the average distance of the shortest path of a vertex between other vertices in the graph. Considering a social network, a person with high closeness centrality do not depend as much on others to communicate with other people in the network. The closeness centrality of a vertex is related to its potential independency and efficiency to control communication.
+where $n$ is the total number of vertices in the graph and $a(v_i, v_k)$ is $1$ if and only if $v_i$ and $v_k$ are connected by one edge, or $0$ otherwise.
+
+Considering a social network, a person (vertex) that has the greatest number of connections can be considered one of the focal points of the network, since it can directly read the most vertices in the graph. Given a graph with n vertices, the maximum value the degree centrality of a vertex in the graph can be is $n-1$. The degree centrality of a vertex is related to its potential communication activity.
+
+\item[Betweenness Centrality] This measure is given by the frequency in which a vertex is present in the shortest path between other vertices. Formally, the Betweenness Centrality $C_B$ of a vertex $v_k$ is given by
+
+\begin{equation}
+C_B(v_k) = \sum_{i \neq j \neq k}^{n} \frac{\sigma_{ij}(v_k)}{\sigma_{ij}},
+\end{equation}
+
+where $\sigma_{ij}$ is the total number of shortest paths from vertex $v_i$ to vertex $v_j$ and $\sigma_{ij}(v_k)$ is the total number of shortest paths from $v_i$ to $v_j$ that passes through $v_k$.
+
+Considering a social network, a person with high betweenness centrality is capable of influencing others by intercepting connections between several vertices in the graph. The betweenness centrality of a vertex is related to its potential control of communication.
+
+\item[Closeness Centrality] This measure is given by the inverse of the sum distance of the shortest path of a vertex between other vertices in the graph. Formally, the Closeness Centrality $C_C$ of a vertex $v_k$ is given by
+
+\begin{equation}
+C_C(v_k) = \frac{1} {\sum_{i=1}^{n} d(v_i, v_k)}
+\end{equation}
+
+where $d(v_i, v_k)$ is the number of edges in the shortest path from $v_i$ to $v_k$.
+
+Considering a social network, a person with high closeness centrality do not depend as much on others to communicate with other people in the network. The closeness centrality of a vertex is related to its potential independency and efficiency to control communication.
 \end{description}
 
 \section{Graph Databases}
@@ -160,9 +186,9 @@ Graph Databases are an alternative to Relational Database Management Systems (RD
 
 The most popular form of graph model is the labeled property graph model \cite{Robinson2015}. The main characteristics of a labeled property graph are:
 \begin{itemize}
-\item Vertices and dges can contain properties, i.e. key-value pairs
+\item Vertices and edges can contain properties, i.e. key-value pairs
 \item Vertices can be labeled with one or more labels
-\item Edges are named and directed, i.e. always have start and end vertices
+\item Edges are labeled and directed, i.e. always have start and end vertices
 \end{itemize}
 
 The formal definition for a labeled property graph is given by $G = (V, E, L_V, L_E, A_V, A_E)$, where:
@@ -181,34 +207,11 @@ Scientific research related to graph data models were continuously published bet
  
 Recently this area has gained again attention from the community, due to the emergence of trendy projects (chemistry, biology, social network, semantic web, among others) where the importance of information relies not only in the entities but also in the relationship between them \cite{Angles2012}. Most recent implementations of graph databases are concerned with handling increasing amount of data and improving performance in retrieving and manipulating data.
  
-The most popular graph database according to DBEngines\footnote{https://db-engines.com/en/system/Neo4j} website is Neo4J\footnote{https://neo4j.com/}. It is an open source native graph storage database implemented in Java. Neo4J has its own query language called Cypher, which can be used to create, update and retrieve vertices and edges. This graph database also provides high availability and scalability for big volume of graph data.
+The most popular graph database system according to DBEngines\footnote{https://db-engines.com/en/system/Neo4j} website is Neo4J\footnote{https://neo4j.com/}. It is an open source native graph storage database system implemented in Java. Neo4J has its own query language called Cypher, which can be used to create, update and retrieve vertices and edges. This graph database system also provides high availability and scalability for big volume of graph data.
 
-Besides Neo4J, there are other popular graph databases according to DB Engine site. OrientDB\footnote{http://orientdb.com/orientdb/} is a NoSQL Multi-Model database, which means it stores data in the form of documents, key-value stores, objects, graph and others. Like Neo4J, OrientDB is also implemented in Java, but it uses an extended version of SQL that includes special operators to manipulate graph. This database allows the creation of a pre-defined data schema and the definition of complex data type, like dates, decimals and binary objects (BLOB).
+Besides Neo4J, there are other popular graph databases system according to DB Engine site. OrientDB\footnote{http://orientdb.com/orientdb/} is a NoSQL Multi-Model database, which means it stores data in the form of documents, key-value stores, objects, graph and others. Like Neo4J, OrientDB is also implemented in Java, but it uses an extended version of SQL that includes special operators to manipulate graph. This database system allows the creation of a pre-defined data schema and the definition of complex data type, like dates, decimals and binary objects (BLOB).
  
-TitanDB\footnote{http://titan.thinkaurelius.com/} is a native graph database implemented in Java. In order to establish connection with the hard disk, Titan needs to be linked to a data storage system - Cassandra\footnote{http://cassandra.apache.org/}, HBase\footnote{https://hbase.apache.org/} or BerkeleyDB\footnote{http://www.oracle.com/technetwork/database/database-technologies/berkeleydb/overview/index.html} - that is suitable for the application. The creation of vertices, edges and the submission of queries can be done through a Java API or through a Gremlin server.
-
-\subsection{Comparing Graph Databases Performance}
-One of the basic tasks when manipulating a database is to retrieve an object given its id. The experiment described in \cite{jouili2013empirical} records the average time to retrieve a vertex by its id, given an 500,000 vertices graph and 4 clients executing this action 200 times. This process was executed using Neo4J, OrientDB and TitanDB using Cassandra as backend.
-
-\begin{figure}[!h]
-\centering
-\includegraphics[width=1\textwidth]{../time_test.png}
-\caption{Chart with mean time that each DB took to retrieve a vertex (node) by its id \cite{jouili2013empirical}}
-\label{fig:figure10}
-\end{figure}
-
-According to Figure \ref{fig:figure10}, Neo4J and OrientDB have similar performance, being OrientDB slightly faster to retrieve a vertex given its id. On the other hand, TitanDB using Cassandra as backend has a bad performance compared with the other DBs. However, TitanDB can be connected with other backend services, which can improve its performance for this task.
- 
-Another common concern among developers is the amount of memory taken by the database. In the experiment shown in \cite{mccoll2014performance}, a graph containing 32,000 vertices and 256,000 edges was stored in Neo4J, OrientDB and TitanDB and the amount of memory required by each database was measured.
-
-\begin{figure}[!h]
-\centering
-\includegraphics[width=1\textwidth]{../memory_test.png}
-\caption{Chart with the amount of memory required for each DB \cite{mccoll2014performance}}
-\label{fig:figure11}
-\end{figure}
-
-From the Figure \ref{fig:figure11}, we can notice that OrientDB is the one that consumes the most, reaching up to 10.156 MB of memory. On the other hand, TitanDB requires less memory, only needing 388 MB to store the graph.
+TitanDB\footnote{http://titan.thinkaurelius.com/} is a native graph database system implemented in Java. In order to establish connection with the hard disk, Titan needs to be linked to a data storage system - Cassandra\footnote{http://cassandra.apache.org/}, HBase\footnote{https://hbase.apache.org/} or BerkeleyDB\footnote{http://www.oracle.com/technetwork/database/database-technologies/berkeleydb/overview/index.html} - that is suitable for the application. The creation of vertices, edges and the submission of queries can be done through a Java API or through a Gremlin server.
 
 \section{Final Considerations}
 In this chapter, we discussed the main concepts related to the work presented in this dissertation. Initially, the definition of Data Warehouse and Multidimensional Model were introduced, followed by a detailed view on different types and operators an OLAP system can have. Then, we covered the main components of a graph and how it can be classified according to different characteristics. Finally, we explained the definition of a Graph Database and went through a historical overview of such systems, as well as a comparison of the most popular Graph DBs nowadays. In the next chapter, we will review the most important research published that implements an OLAP system using Graph Databases.
