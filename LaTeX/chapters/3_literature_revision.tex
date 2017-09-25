@@ -90,7 +90,7 @@ Classic OLAP operations in an t-aggregate graph can be interpreted as follows:
 \item[Slice / dice] Select a subgraph of a snapshot based on topological dimensions
 \end{description}
 
-The Topological OLAP is further explained in \cite{Qu2011}. This work takes into consideration two properties (T-Distributiveness and T-Monotonicity) used to classify how different measures can be performed in an OLAP Graph. A measure function is considered T-Distributive if the result of the function applied to high-level vertices from the graph can be obtained by the computation of pre-computed results of the same function applied to lower-level vertices from the same graph. On the other hand, a measure is considered T-Monotone, if the data search space can be pruned given a user-defined threshold, by dropping vertices pairs with measures that don't satisfy the threshold. The paper shows experiments using common constraint function, proven to be T-Distributives and/or T-Monotones, such as SUM, MIN, MAX, Density, Degree Centrality, Closeness Centrality, among others.
+The Topological OLAP is further explained in \cite{Qu2011}. This work takes into consideration two properties (T-Distributiveness and T-Monotonicity) used to classify how different measures can be performed in an OLAP Graph. A measure function is considered T-Distributive if the result of the function applied to high-level vertices from the graph can be obtained by the computation of pre-computed results of the same function applied to lower-level vertices from the same graph. On the other hand, a measure is considered T-Monotone, if the data search space can be pruned given a user-defined threshold, by dropping vertices pairs with measures that do not satisfy the threshold. The paper shows experiments using common constraint function, proven to be T-Distributives and/or T-Monotones, such as SUM, MIN, MAX, Density, Degree Centrality, Closeness Centrality, among others.
 
 \section{HMGraph}
 
@@ -134,11 +134,11 @@ The work presented in \cite{Wang2014} proposes a parallel Graph OLAP system, ado
 \label{fig:figure20}
 \end{figure}
 
-Given an attributed graph with n vertex dimensions and m edge dimensions, the Hyper Graph Cube will contain $2^{n+m}$ aggregate graph obtained as described by the work of \cite{Zhao2011}. This Hyper Graph Cube can be seen as the cartesian product between all the vertex-aggregate networks (when one or more vertex dimensions are aggregated) and the edge-aggregate networks (when one or more edge dimensions are aggregated). This cube arrangement can support the following query categories:
+Given an attributed graph with n vertex dimensions and m edge dimensions, the Hyper Graph Cube will contain $2^{n+m}$ aggregate graphs obtained as described by the work of \cite{Zhao2011}. This Hyper Graph Cube can be seen as the cartesian product between all the vertex-aggregate networks (when one or more vertex dimensions are aggregated) and the edge-aggregate networks (when one or more edge dimensions are aggregated). This cube arrangement can support the following categories of queries:
 
 \begin{description}
-\item[Category 1] Queries answered by information stored either in a vertex or  in a edge attributes. For example:``How many relationships appeared in 2012?'' or ``What is the percentage of users in each different professions in this network?''
-\item[Category 2] Queries answered by integrating the knowledge stored in both vertex and edges attributes. For example: ``What is the trend of the number of relations appearing between USA and SG (Singapore) in the last 3 years?''
+\item[Category 1] Queries answered by information stored either in a vertex or in an edge attributes. For example:``How many relationships appeared in 2012?'' or ``What is the percentage of users in each different profession in this network?''
+\item[Category 2] Queries answered by integrating the knowledge stored at both vertex and edges attributes. For example: ``What is the trend of the number of relations appearing between USA and SG (Singapore) in the last 3 years?''
 \item[Category 3] Queries answered by an aggregate graph, that provides a summarised view of the data along some dimensions. For example: ``What is the graph structure as grouped by users' gender as well as relationship type?''
 \end{description}
 
@@ -151,7 +151,7 @@ The materialisation for the Hyper Graph Cube is done using Map-Reduce(MR) jobs. 
 One of the most recent works in this area is presented in \cite{ghrab2015framework}. This paper proposes a new technique for extracting multidimensional concepts and building OLAP cubes from heterogeneous property graphs. The authors propose a new classification of graph measures based on the aggregation type and computation algorithm:
 \begin{description}
 \item[Content-based measure] Calculated based on graph's vertices and edges attributes. They are similar to traditional OLAP measures.
-\item[Graph-specific measure] Obtained by applying graph algorithms. They capture topological properties of the graph.
+\item[Graph-based measure] Obtained by applying graph algorithms. They capture topological properties of the graph.
 \item[Graph as measure] Different aggregation levels of a graph can be considered measures.
 \end{description}
 
@@ -223,7 +223,7 @@ One relevant characteristic of the works presented so far is the little explanat
 \end{tabularx}
 \end{table}
 
-The work proposed here will be focused in heterogeneous graph datasets and will support the three types of measures described previously, in a similar way as presented by the work on GRAD Graph Cubes. In addition to that, this work will also explore OLAP operations and network analysis on graph databases.
+The work proposed here will be focused in heterogeneous graph datasets and will support the three types of measures described previously, in a similar way as presented by the work on GRAD Graph Cubes. In addition to that, this work will also explore OLAP operations and network analysis on graph databases without the need to define a new graph model, as suggested by previous works, eliminating the extra step of parsing operational data to the new model.
 
 \section{Final Considerations}
 
