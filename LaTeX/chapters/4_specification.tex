@@ -19,7 +19,7 @@ Consider the Database System and Logic Programming (DBLP) dataset as the running
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=0.7\textwidth]{../dblp_schema.png}
+\includegraphics[width=0.8\textwidth]{../dblp_schema_with_attr.png}
 \caption{Schema representation of the DBLP data graph}
 \label{fig:figure25}
 \end{figure}
@@ -53,9 +53,9 @@ In our running example, we can define $d_1 = (journal, Publication)$ and $d_2 = 
 \item[Content-based measure] For this kind of measure is calculated based on the vertices and edges attributes and the function $F \in \{SUM, COUNT, AVG, or other aggregate functions\}$ used in the calculation are similar to the ones used in an OLAP system. 
 
 In our running example, the total number of authors that published a work in 2007 is a content-based measure that is calculated using the function $COUNT$, which will count the number of \emph{Author} vertices that have a relationship \emph{PUBLISHED} to \emph{Publication} vertices that have attribute \emph{year} equals to 2007.
-\item[Graph-specific measure] This type of measure is calculated by applying a network analysis algorithm over the graph, i.e. a network analysis algorithm is used as the function $F$. 
+\item[Graph-based measure] This type of measure is calculated by applying a network analysis algorithm over the graph, i.e. a network analysis algorithm is used as the function $F$. 
 
-In our running example, the list of authors that most contributed with other authors is a graph-specific measure that is computed by applying the degree centrality measure to the \emph{Author} vertices of the graph.
+In our running example, the list of authors that most contributed with other authors is a graph-based measure that is computed by applying the degree centrality measure to the \emph{Author} vertices of the graph.
 \item[Graph as measure] This kind of measure is given by different aggregation levels of a graph and the function $F$ that calculates this measure is the aggregate function that will generate the aggregate graph. 
 
 In our running example, the network of authors and  publications aggregated according to the venue in which the work was published in is a graph that represents a measure.
@@ -66,7 +66,7 @@ In our running example, the network of authors and  publications aggregated acco
 
 The Graph OLAP system proposed in this work attempts to provide an efficient way to answer analytical queries without having to propose a new graph data model, which would imply changing the original data source model. The Figure \ref{fig:figure27} depicts the architecture of the system, illustrating its main components: Graph Aggregators, Aggregated Graphs and Analytical Query Processor.
 
-The Graph Aggregators are modules that are responsible for processing the original data and generate Aggregate Graphs, which are stored in Aggregate Graph Databases. The Analytical Query Processor is in charge of processing the incoming query and determine whether it should be answered by processing the original or the aggregate data, based on the type of measure being analysed.
+The Graph Aggregators are modules that are responsible for processing the original data and generate Aggregate Graphs, which are stored in Aggregate Graph Databases. The Analytical Query Processor is in charge of processing the incoming query and the user will determine whether it should be answered by processing the original or the aggregate data, based on the type of measure being analysed.
 
 \begin{figure}[ht]
 \centering
@@ -75,9 +75,9 @@ The Graph Aggregators are modules that are responsible for processing the origin
 \label{fig:figure27}
 \end{figure}
 
-The system's input is an analytical query submitted by the user, that will be processed by the Analytical Query Processor (AQP). According to the type of measure required by the user, the AQP will determine which specific processor will handle the query: graph-based, content-based or graph measures processors. If the user asks for a graph-based measure, the AQP will consume the original data stored in the graph database to calculate the measure. On the other hand, if the user requires a content-based or a graph as measure, the AQP will calculate the measure based on the data from Aggregate Graphs, which are also stored in graph databases.
+The system's input is an analytical query submitted by the user (1), that will be processed by the Analytical Query Processor (AQP) (2). According to the type of measure required by the user, the AQP will determine which specific processor will handle the query: graph-based, content-based or graph measures processors. If the user asks for a graph-based measure, the AQP will consume the original data stored in the graph database (3) to calculate the measure. On the other hand, if the user requires a content-based or a graph as measure, the AQP will calculate the measure based on the data from Aggregate Graphs (4), which are also stored in graph databases.
 
-The Aggregate Graphs are generated by the Graph Aggregators (GAs), which are defined during the design process of the system by the project designer. The project designer is responsible to define what are the dimensions considered in the OLAP system and, therefore, create the GAs that will generate all possible aggregate graphs for the dimensions. More details on Aggregate Graphs and Graph Aggregators are given in the following sections.
+The Aggregate Graphs are generated by the Graph Aggregators (GAs) (5), which are defined during the design process of the system by the project designer. The project designer is responsible to define what are the dimensions considered in the OLAP system and, therefore, create the GAs that will generate all possible aggregate graphs for the dimensions. More details on Aggregate Graphs and Graph Aggregators are given in the following sections.
 
 The data source considered for this system is a Graph Database that follows the labeled property graph model and supports heterogeneous graphs. This means that vertices can have one or more labels indicating different types of entities. Vertices and edges can have properties. We assume that the data stored in the GDB is integrated, i.e. the data in the repository is consistent, well-formatted and normalised.
 
@@ -140,13 +140,13 @@ Once the aggregate graph is generated, it will be stored in a graph database and
 
 The Analytical Query Processor (AQP) is responsible for processing the query submitted by the user. This component contains three modules that will process the query differently based on the type of measure requested by the user:
 \begin{description}
-\item[Graph-based measure] To calculate this measure, the AQP consumes the data from the original graph database and executes network analysis algorithms on the data. 
-
-In our running example, we could submit a query asking for the \emph{Author} node with highest centrality degree. The AQP calculates the centrality degree for each node in the original graph using an external library. Then, it should return the node with id \textbf{A2}, since it is the Author node with the highest number of connections with other nodes.
-
 \item[Content-based measure] To calculate this measure, the AQP consumes the data from an aggregate graph and uses the aggregate function to give the resulting measure, which can be a single value, a list or a table of values. This module's response is similar to the response given by traditional OLAP systems.
 
 From our running example, we can ask for the number of publications by year. In this case AQP consumes the data from the aggregate graph illustrated in Figure \ref{fig:figure28} and it would list the nodes with \emph{Publication Aggregate} label, which already contains the count measure as attribute.
+
+\item[Graph-based measure] To calculate this measure, the AQP consumes the data from the original graph database and executes network analysis algorithms on the data. 
+
+In our running example, we could submit a query asking for the \emph{Author} node with highest centrality degree. The AQP calculates the centrality degree for each node in the original graph using an external library. Then, it should return the node with id \textbf{A2}, since it is the Author node with the highest number of connections with other nodes.
 
 \item[Graph as measure] For this type of measure, the AQP also consumes data from an aggregate graph, but in this case, the measure is the aggregated graph itself. Therefore, this module does not need to perform other calculations.
 
