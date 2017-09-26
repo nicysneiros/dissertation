@@ -65,7 +65,7 @@ The dataset used for the experiments was the Database System and Logic Programmi
 
 The excerpt shown in Listing  \ref{lst:listing1} refers to an article published in J. ACM journal and it contains information about the article's authors, title, pages in journal, year of publication and other informations about the journal's volume, number and electronic edition location. Each publication also has a unique key and the date of the last modification as attributes and an element with the url of the publication in the DBLP website. Besides journal articles, the DBLP dataset also contains books, thesis, conferences and workshop papers, among others.
 
-Once the XML file was downloaded, all the data was parsed and stored into a SQLite database. In order to have a more controlled environment for the experiments, we selected a subset of the original data, considering only papers and articles published in the following venues since 2014:
+Once the XML file was downloaded, all the data was parsed and stored into a SQLite database. In order to have a more controlled environment for the experiments and allow an eventual manual check of the results obtained from hte experiments, we selected a subset of the original data, considering only papers and articles published in the following venues since 2014:
 
 \begin{itemize}
 \item SIGMOD International Conference on Management of Data (SIGMOD)
@@ -110,6 +110,24 @@ Figure \ref{fig:figure34} depicts the result of the query, listing the venues or
 \includegraphics[width=0.8\textwidth]{../exp_content_measure.png}
 \caption{Result of experiment with a content-based measure query}
 \label{fig:figure34}
+\end{figure}
+
+The other OLAP operation tested for this type of measure was a roll-up operation. For this experiment, we had to include a random month of release for each publication in order to establish a hierarchy between the attributes of a publication, i.e. month and year. Once the original data was chaged and the fictional month of release of each publication was added, we generated an aggregate graph for the dimensions year and month using the COUNT aggregate function. The result of the aggregate graph is show in Figure \ref{fig:figure341}, where we can see the amount of publications per month per year.
+
+\begin{figure}[!h]
+\centering
+\includegraphics[width=0.8\textwidth]{../exp_content_measure_rollup_1.png}
+\caption{Result of experiment with a query for the dimensions year and month of publication}
+\label{fig:figure341}
+\end{figure}
+
+In order to execute a roll-up operation on the data and have an overview of the data only considering the dimension year, we generated another aggregate graph for that dimension using the COUNT aggregate function. The result of the second aggregate graph is show in Figure \ref{fig:figure342}, where we can see the amount of publications per year.
+
+\begin{figure}[!h]
+\centering
+\includegraphics[width=0.8\textwidth]{../exp_content_measure_rollup_2.png}
+\caption{Result of performing a roll-up operation on the content-based measure}
+\label{fig:figure342}
 \end{figure}
 
 \subsection{Graph-specific Measure}
