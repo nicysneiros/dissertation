@@ -1,0 +1,43 @@
+\chapter{Introduction}
+In this chapter, we will present the motivations for the realisation of this work and give a clear definition of the problem to be addressed. The general and specific objectives of this research will be listed, as well as the remaining structure of the document.
+
+\section{Motivation}
+In recent years, our ability to collect data from different sources has increased significantly \cite{fan2013mining}. We can retrieve data from different devices, with different formats and different levels of connection. However, our capability to store, process and analyse these large collections of connected data has still opportunity for improvement.
+
+For this reason, Graph Databases (GDBs) have been gaining attention in the database community due to the good performance when dealing with highly connected data. In comparison to Relational Databases, where the execution performance of a query that requires intensive join operations deteriorates proportionally to data size, Graph Databases performance remains constant with respect to the size of the graph \cite{Robinson2015}. GDBs allow a more natural way to represent data as vertices and edges. Social networks, semantic web pages and recommendation systems are some examples of applications which handle data relationships and could perform better if the data were stored in a GDB \cite{Miller2013}. 
+
+GDBs also provide a flexible data model, where the main information stored is the relationship between entities. This feature allows network processing based analysis to be done, such as pattern detection, edge path analysis and clustering techniques. These different analysis techniques allow the development of solutions for challenging problems, not only those approaches usually applied in traditional relational databases or data warehousing \cite{Loshin2013}. 
+
+Our main motivation comes from the fact that there are no consolidate tools that can execute both network and multidimensional analysis on a Graph Database. For instance, a social network implemented using a GDB could take advantage of performing analysis over the topology of the network formed by the users, but it would fail in performing multidimensional analysis that would result in Business Intelligence centered reports. In the academic field, there are some framework proposals that aim at the construction of a multidimensional cube composed by aggregate graphs, which are obtained from the combination of vertices and edges of the original graph, according to the dimensions and measures being analysed. However, most part of the researches in this area are focused on the OLAP analysis for homogeneous graphs (graphs with only one type of vertex), while the works dedicated to heterogeneous graphs (graphs with more than one type of vertices) require an intermediate data model in order to execute the multidimensional analysis. The need of a intermediate data model means that the operational data would have to be parsed into the new data model in order to be analysed, including one more step to the analysis process.
+
+\section{Problem Definition}
+Given the scenario described in the previous section, we investigate the problem to be addressed from the question: ``How can we execute both network and multidimensional analysis on heterogeneous graphs data without the need to generate an intermediate data model?''. Considering the question proposed, the problem can be defined as: given a graph $G=(V,E)$, with a set of vertices $V$ and a set of edges $E$, what is the architecture and how is the operation of a system that is able to execute network analysis algorithms and OLAP queries over the graph $G$, without generating an intermediate data model.
+
+\section{Objectives}
+The general objective of this work is to build a system that supports the execution of network and multidimensional analysis on a Graph Database, without the generation of an intermediate data model for the graph. In order to achieve the general objective, some specific objectives were considered:
+\begin{itemize}
+\item Generate multidimensional view of the original data without changing the data model adopted by the operational part of the system
+\item Give support for OLAP operations (roll up, drill down, slice and dice) to be executed over the multidimensional view
+\item Give support for network analysis algorithms to be executed over the original data
+\item Define the architecture of the complete system
+\end{itemize}
+
+\section{Expected Contributions}
+Once the main problem and the objectives are defined, we expect from this work the following contributions:
+
+\begin{itemize}
+\item Architecture definition, specification of an algorithm to generate aggregate graphs and implementation of a prototype for a Data Analysis System for Graph Databases.
+\item Implementation of OLAP operators and network analysis algorithms, providing a comprehensive analysis of the graph data.
+\item Experiments and qualitative analysis in comparison with existing frameworks.
+\end{itemize}
+
+
+\section{Document Structure}
+The rest of the document is organized as follows:
+\begin{description}
+\item[Chapter 2] Introduces the main concepts related to the theoretical foundation of this work, such as OLAP systems, Graphs and Graph Databases.
+\item[Chapter 3] Gives an overview of the state of the art for OLAP system with Graph Databases, presenting the main frameworks proposed in this area.
+\item[Chapter 4] Presents the specification of the system proposed, detailing the architecture and the main components of the solution implemented.
+\item[Chapter 5] Shows how the system was implemented and describes some experiments and the obtained results.
+\item[Chapter 6] Concludes the document, recapitulating the work presented and giving insights for future work.
+\end{description}
